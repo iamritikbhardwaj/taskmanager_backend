@@ -1,0 +1,25 @@
+# Ignore all node_modules
+node_modules
+
+# Ignore log files
+logs
+*.log
+
+# Ignore Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Ignore Dependency directories
+jspm_packages
+web_modules
+
+# Ignore nyc test coverage
+.nyc_output
+
+# Ignore TypeScript cache
+*.tsbuildinfo
+
+# Ignore .env
+.env
