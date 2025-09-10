@@ -7,6 +7,14 @@ const taskController = {
     res.status(200).json(tasks);
   }),
 
+  getTaskById: asyncHandler(async (req, res) => {
+    const task = await taskModel.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    res.status(200).json(task);
+  }),
+
   createTask: asyncHandler(async (req, res) => {
     const task = await taskModel.create(req.body);
     res.status(201).json(task); // 201 Created is more appropriate

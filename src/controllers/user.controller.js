@@ -59,7 +59,14 @@ const userController = {
       maxAge: 1000 * 60 * 60 * 8 // 8 hours
     });
 
-    res.status(200).json({ message: "Logged in successfully" });
+    res.cookie("token", token, {
+      httpOnly: false,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production" ? true : false,
+      maxAge: 1000 * 60 * 60 * 8 // 8 hours
+    });
+
+    return res.status(200).json({ message: "Logged in successfully", token: token, user: user });
   }),
   createUserWithHashedPassword: asyncHandler(async (req, res) => {
     const salt = await bcrypt.genSalt(10);
