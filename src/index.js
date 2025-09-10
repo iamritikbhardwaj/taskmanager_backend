@@ -42,7 +42,7 @@ const __dirname = path.resolve();
 // Serve frontend build files in production
 if (process.env.ENVIRONMENT === 'PRODUCTION') {
   // Serve static files from the frontend build directory
-  app.use(express.static(path.join(__dirname, 'build')));
+  app.use(express.static(path.join(__dirname, 'dist')));
   // All unknown routes should serve the frontend's index.html file
   app.get('*', (req, res) =>
     res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
