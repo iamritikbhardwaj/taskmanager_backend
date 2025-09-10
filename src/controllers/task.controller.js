@@ -3,7 +3,9 @@ import taskModel from "../models/task.models.js"; // Make sure the extension mat
 
 const taskController = {
   getAllTasks: asyncHandler(async (req, res) => {
-    const tasks = await taskModel.find();
+    const tasks = await taskModel.find({
+      userId: req.query.id
+    });
     res.status(200).json(tasks);
   }),
 
@@ -16,6 +18,7 @@ const taskController = {
   }),
 
   createTask: asyncHandler(async (req, res) => {
+    req.body.userId = req.params.id; // Ensure the task is associated with the user
     const task = await taskModel.create(req.body);
     res.status(201).json(task); // 201 Created is more appropriate
   }),

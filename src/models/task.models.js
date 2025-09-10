@@ -14,7 +14,7 @@ const taskSchema = new mongoose.Schema({
     required: true
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,  // if referencing a User document
+    type: mongoose.Schema.Types.ObjectId,  // referencing a User document
     required: true,
     ref: 'User'
   }
