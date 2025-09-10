@@ -1,13 +1,14 @@
-# Project Documentation
+## ✅ Updated Project Documentation
 
-# Task and User Management API
+# 📝 Task and User Management API
 
-This project is a simple RESTful API built with **Node.js**, **Express**, and **MongoDB (Mongoose)**.  
-It provides user authentication and task management functionalities.
+A full-featured RESTful API built with **Node.js (v22)**, **Express**, and **MongoDB (via Mongoose)**.
+
+This API allows users to register, log in, and manage tasks. Authentication is handled via **JWT** stored in **HTTP-only cookies**.
 
 ---
 
-## Table of Contents
+## 📚 Table of Contents
 
 1. [Project Setup](#project-setup)  
 2. [Environment Variables](#environment-variables)  
@@ -18,69 +19,79 @@ It provides user authentication and task management functionalities.
    - [Task Routes](#task-routes)  
 6. [Authentication](#authentication)  
 7. [Testing the API](#testing-the-api)  
-8. [Future Improvements](#future-improvements)  
+8. [Docker](#docker)  
+9. [Future Improvements](#future-improvements)  
+10. [License & Contact](#license--contact)  
 
 ---
 
-## Project Setup
+## 🛠️ Project Setup
 
 1. Clone the repository:
 
 ```bash
-   git clone <your-repo-url>
-   cd <project-folder>
-```
+git clone https://github.com/your-username/task-manager-api.git
+cd task-manager-api
+````
 
 2. Install dependencies:
 
 ```bash
-   npm install
+npm install
 ```
 
-3. Create a `.env` file in the root directory with necessary environment variables (see next section).
+3. Create a `.env` file in the root directory using the example below.
 
 ---
 
-## Environment Variables
+## 🔐 Environment Variables
 
-Create a `.env` file and add the following:
+Create a `.env` file and configure the following:
 
-```bash
+```env
 PORT=8080
-MONGODB_URI=<your-mongodb-connection-string>
-JWT_SECRET=<your-secret-key>
+MONGODB_URI=mongodb://localhost:27017/taskmanager
+JWT_SECRET=your_super_secret_jwt_key
 NODE_ENV=development
 ```
 
-* `PORT`: Port on which the server runs (default: 8080).
-* `MONGODB_URI`: Your MongoDB connection string.
-* `JWT_SECRET`: Secret key for signing JSON Web Tokens.
-* `NODE_ENV`: Environment mode (`development` or `production`).
+| Variable      | Description                          |
+| ------------- | ------------------------------------ |
+| `PORT`        | Port on which the server will run    |
+| `MONGODB_URI` | MongoDB connection URI               |
+| `JWT_SECRET`  | Secret key used to sign JWT tokens   |
+| `NODE_ENV`    | Set to `development` or `production` |
 
 ---
 
-## Installation
+## 📦 Installation
 
-1. Make sure you have **Node.js** and **npm** installed.
-2. Run `npm install` to install project dependencies.
+Make sure you have **Node.js v22+** and **npm** installed.
+
+```bash
+node -v
+# Should print v22.x.x
+
+npm install
+```
 
 ---
 
-## Running the Server
+## 🚀 Running the Server
 
-Run the server using:
+### Start normally:
 
 ```bash
 npm start
 ```
 
-or if you use **nodemon** for development:
+### For development (with live reload):
 
 ```bash
 npm run dev
 ```
 
-The API will be available at:
+Once running, the API is accessible at:
 
 ```bash
 http://localhost:8080/
@@ -88,42 +99,72 @@ http://localhost:8080/
 
 ---
 
-## API Endpoints
+## 🔌 API Endpoints
 
-### User Routes
+### 👤 User Routes
 
-| Method | Endpoint           | Description         |
-| ------ | ------------------ | ------------------- |
-| GET    | `/api/users`       | Get all users       |
-| POST   | `/api/users`       | Create a new user   |
-| PUT    | `/api/users/:id`   | Update a user by ID |
-| DELETE | `/api/users/:id`   | Delete a user by ID |
-| POST   | `/api/users/login` | Log in a user       |
+| Method | Endpoint            | Description            |
+| ------ | ------------------- | ---------------------- |
+| GET    | `/api/users`        | Get all users          |
+| POST   | `/api/users`        | Register a new user    |
+| PUT    | `/api/users/:id`    | Update a user          |
+| DELETE | `/api/users/:id`    | Delete a user          |
+| POST   | `/api/users/login`  | Log in a user          |
+| POST   | `/api/users/logout` | Log out (clear cookie) |
 
-### Task Routes
+### ✅ Authenticated Routes
 
-| Method | Endpoint         | Description         |
-| ------ | ---------------- | ------------------- |
-| GET    | `/api/tasks`     | Get all tasks       |
-| POST   | `/api/tasks`     | Create a new task   |
-| PUT    | `/api/tasks/:id` | Update a task by ID |
-| DELETE | `/api/tasks/:id` | Delete a task by ID |
+Some routes may require login (protected via JWT in cookies).
 
 ---
 
-## Authentication
+### 📋 Task Routes
 
-* Users can log in using `/api/users/login` endpoint.
-* On successful login, a JWT token is set in an HTTP-only cookie for authentication.
-* Protect your routes by verifying JWT tokens (not included by default, can be added).
+| Method | Endpoint         | Description       |
+| ------ | ---------------- | ----------------- |
+| GET    | `/api/tasks`     | Get all tasks     |
+| POST   | `/api/tasks`     | Create a new task |
+| PUT    | `/api/tasks/:id` | Update a task     |
+| DELETE | `/api/tasks/:id` | Delete a task     |
+
+> You can add middleware to protect task routes using JWT (recommended).
 
 ---
 
-## Testing the API
+## 🔐 Authentication
 
-Use **curl**, **Postman**, or any API client to test the endpoints.
+### Login Flow
 
-Example curl command to create a user:
+1. User logs in via `POST /api/users/login` with email and password.
+2. Server responds with a **JWT token** set as an **HTTP-only cookie**.
+3. Authenticated routes should read this cookie and verify the token using middleware.
+
+> Example of route protection middleware (not included by default):
+
+```js
+import jwt from 'jsonwebtoken'
+
+const protect = (req, res, next) => {
+  const token = req.cookies.token
+  if (!token) return res.status(401).json({ message: 'Unauthorized' })
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    req.user = decoded
+    next()
+  } catch {
+    res.status(401).json({ message: 'Invalid token' })
+  }
+}
+```
+
+---
+
+## 🧪 Testing the API
+
+Use **curl**, **Postman**, or similar API tools.
+
+### Register a User
 
 ```bash
 curl -X POST http://localhost:8080/api/users \
@@ -131,7 +172,7 @@ curl -X POST http://localhost:8080/api/users \
   -d '{"username":"john","email":"john@example.com","password":"mypassword"}'
 ```
 
-Example curl command to login:
+### Log In
 
 ```bash
 curl -X POST http://localhost:8080/api/users/login \
@@ -142,23 +183,55 @@ curl -X POST http://localhost:8080/api/users/login \
 
 ---
 
-## Future Improvements
+## 🐳 Docker
 
-* Add **route protection** middleware to secure sensitive endpoints.
-* Add **input validation** using libraries like **Zod** or **Joi**.
-* Implement **refresh tokens** for better session management.
-* Add **role-based access control** (admin/user).
-* Add **Swagger/OpenAPI** documentation for better API docs.
+If you want to run this app inside Docker:
+
+### 1. Create a `Dockerfile`
+
+```Dockerfile
+FROM node:22
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 8080
+
+CMD ["npm", "start"]
+```
+
+### 2. Build & Run
+
+```bash
+docker build -t task-manager-api .
+docker run -p 8080:8080 --env-file .env task-manager-api
+```
 
 ---
 
-## License
+## 🌱 Future Improvements
 
-MIT License.
+* ✅ Add JWT-based route protection
+* ✅ Add middleware for input validation (e.g., Zod, Joi)
+* 🔄 Implement refresh token flow
+* 🔒 Add role-based access control (RBAC)
+* 📃 Add Swagger / OpenAPI documentation
+* 🧪 Add unit and integration tests (e.g., with Jest and Supertest)
 
 ---
 
-## Contact
+## 🪪 License & Contact
 
-For questions or contributions, please contact:
-Ritik Singh - [ritiklrt2@gmail.com](mailto:ritiklrt2@gmail.com)
+**License**: MIT
+
+**Author**: Ritik Singh
+**Email**: [ritiklrt2@gmail.com](mailto:ritiklrt2@gmail.com)
+
+---
+
+> PRs and contributions are welcome. ✨
+> If you have suggestions or issues, feel free to reach out or open an issue.
